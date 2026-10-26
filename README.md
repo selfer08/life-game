@@ -45,6 +45,19 @@ npm run build   # client → client/dist, server → server/dist 빌드
 npm start       # Express가 API와 프론트엔드를 한 포트(기본 4000)에서 함께 제공
 ```
 
+## 한 화면 모드 (서버·DB 없이 실행)
+
+서버 없이 브라우저만으로 돌아가는 버전이에요. 서버의 게임 엔진(`server/src/game`)을 그대로 가져다 쓰고,
+한 화면에서 최대 6명이 번갈아 플레이해요. 진행 상황과 명예의 전당은 브라우저(localStorage)에 저장돼요.
+온라인 멀티플레이와 DB 저장은 지원하지 않아요.
+
+```bash
+cd client
+npm run build:artifact   # client/dist-artifact/life-game.html (파일 1개) 생성
+```
+
+만들어진 HTML은 Claude의 Artifact 기능으로 바로 열 수 있어요. 코드는 `client/src/local/`에 있어요.
+
 ## 프로젝트 구조
 
 ```

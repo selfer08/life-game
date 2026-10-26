@@ -43,7 +43,7 @@ export function Room() {
         <Results results={state.results} onHome={() => nav('/')} />
       </div>
     );
-  return <Game state={state} board={board} mine={mine} accept={accept} />;
+  return <Game state={state} board={board} mine={mine} accept={accept} perform={(token, action) => api.act(state.code, token, action)} />;
 }
 
 function TopBar({ state }: { state: GameState }) {
@@ -149,7 +149,19 @@ function Lobby({ state, mine, onJoined, accept }: { state: GameState; mine: Reco
 
 // ── 게임 화면 ─────────────────────────────────────────
 
-function Game({ state, board, mine, accept }: { state: GameState; board: Board; mine: Record<string, string>; accept: (s: GameState) => void }) {
+export interface GameProps {
+  state: GameState;
+  board: Board;
+  mine: Record<string, string>;
+  accept: (s: GameState) => void;
+  /** 액션을 실행하고 갱신된 상태를 돌려준다. 온라인은 서버 API, 로컬 모드는 브라우저 안의 엔진 */
+  perform: (token: string, action: Action) => Promise<GameState>;
+  topBar?: React.ReactNode;
+  /** 한 화면 모드: 모든 플레이어가 이 기기에서 조작하므로 '나' 표시를 숨긴다 */
+  local?: boolean;
+}
+
+export function Game({ state, board, mine, accept, perform, topBar, local }: GameProps) {
   const { overrides, spinValue, spinKey, busy } = useMoveAnimation(state);
   const [sending, setSending] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -173,7 +185,7 @@ function Game({ state, board, mine, accept }: { state: GameState; board: Board; 
     setErr(null);
     setSending(true);
     try {
-      accept(await api.act(state.code, token, action));
+      accept(await perform(token, action));
     } catch (e) {
       setErr((e as Error).message);
     } finally {
@@ -188,7 +200,7 @@ function Game({ state, board, mine, accept }: { state: GameState; board: Board; 
 
   return (
     <div className="page page--game">
-      <TopBar state={state} />
+      {topBar ?? <TopBar state={state} />}
       <div className="game">
         <section className="board-wrap panel">
           <div className="board-scroll">
@@ -232,6 +244,7 @@ function Game({ state, board, mine, accept }: { state: GameState; board: Board; 
                 player={p}
                 active={p.id === current.id}
                 mine={!!mine[p.id]}
+                showMine={!local}
                 loanRepay={board.loanRepay}
                 onRepay={() => act({ type: 'repayLoan' }, mine[p.id])}
               />

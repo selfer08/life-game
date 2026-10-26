@@ -5,18 +5,19 @@ interface Props {
   player: Player;
   active: boolean;
   mine: boolean;
+  showMine?: boolean;
   loanRepay: number;
   onRepay?: () => void;
 }
 
-export function PlayerCard({ player: p, active, mine, loanRepay, onRepay }: Props) {
+export function PlayerCard({ player: p, active, mine, showMine = true, loanRepay, onRepay }: Props) {
   return (
     <div className={`pcard${active ? ' pcard--active' : ''}${p.retired ? ' pcard--retired' : ''}`} style={{ '--pc': p.color } as React.CSSProperties}>
       <div className="pcard-head">
         <span className="pcard-dot">{p.name.slice(0, 1)}</span>
         <div className="pcard-name">
           <strong>{p.name}</strong>
-          {mine && <span className="chip chip--mine">나</span>}
+          {mine && showMine && <span className="chip chip--mine">나</span>}
           {p.retired && <span className="chip">🌴 은퇴 {p.retireOrder}등</span>}
         </div>
         <div className="pcard-cash">{won(p.cash)}</div>

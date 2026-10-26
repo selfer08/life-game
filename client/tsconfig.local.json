@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "paths": { "node:crypto": ["./src/local/cryptoShim.ts"] }
+  },
+  "include": ["src", "../server/src/game"],
+  "exclude": ["../server/src/game/engine.test.ts"]
+}
